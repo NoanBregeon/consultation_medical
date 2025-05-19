@@ -1,1 +1,30 @@
-git rm -r --cached lib
+# Ignorer le dossier des librairies externes
+/lib/
+
+# Fichiers temporaires ou système
+*.log
+*.tmp
+*.bak
+*.swp
+*.DS_Store
+Thumbs.db
+
+# Environnement local
+.env
+*.sqlite
+
+# Dossiers d’IDE (Visual Studio Code, PhpStorm, etc.)
+.vscode/
+.idea/
+
+# Cache
+/cache/
+vendor/
+node_modules/
+
+# Fichiers de sauvegarde
+*.old
+*.orig
+
+# TCPDF spécifique (si placé ailleurs)
+tcpdf/
