@@ -44,4 +44,35 @@ class MedicamentController {
             ];
         }
     }
+    
+    /**
+     * Gère la suppression d'un médicament
+     */
+    public static function deleteMedicament($code) {
+        return Medicament::delete($code);
+    }
+}
+
+// Traiter la requête de suppression si elle existe
+if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['code'])) {
+    $response = MedicamentController::deleteMedicament($_GET['code']);
+    
+    // Rediriger avec un message de notification
+    $redirectUrl = "../views/medicament.php?message=" . urlencode($response['message']);
+    if ($response['success']) {
+        $redirectUrl .= "&status=success";
+    } else {
+        $redirectUrl .= "&status=error";
+    }
+    
+    // Conserver les paramètres de pagination et de recherche
+    if (isset($_GET['page'])) {
+        $redirectUrl .= "&page=" . intval($_GET['page']);
+    }
+    if (isset($_GET['q'])) {
+        $redirectUrl .= "&q=" . urlencode($_GET['q']);
+    }
+    
+    header("Location: $redirectUrl");
+    exit;
 }
