@@ -36,7 +36,14 @@ $patients = $pdo->query("SELECT * FROM patient ORDER BY nom, prenom")->fetchAll(
 
     <h2>Liste des patients (<?= count($patients) ?>)</h2>
     <table>
-        <tr><th>Nom</th><th>Prénom</th><th>Ville</th><th>Téléphone</th><th>Email</th></tr>
+        <tr>
+            <th>Nom</th>
+            <th>Prénom</th>
+            <th>Ville</th>
+            <th>Téléphone</th>
+            <th>Email</th>
+            <th>Actions</th>
+        </tr>
         <?php foreach ($patients as $patient): ?>
             <tr>
                 <td><?= htmlspecialchars($patient["nom"]) ?></td>
@@ -44,9 +51,23 @@ $patients = $pdo->query("SELECT * FROM patient ORDER BY nom, prenom")->fetchAll(
                 <td><?= htmlspecialchars($patient["ville"]) ?></td>
                 <td><?= htmlspecialchars($patient["telephone"]) ?></td>
                 <td><?= htmlspecialchars($patient["adresse_mail"]) ?></td>
+                <td>
+                    <a href="../controllers/patientController.php?action=delete&id=<?= $patient["Numero_patient"] ?>" 
+                       class="btn-delete"
+                       onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce patient ?');">
+                        <i class="fas fa-trash"></i> Supprimer
+                    </a>
+                </td>
             </tr>
         <?php endforeach; ?>
     </table>
+
+    <!-- Ajouter ce code pour afficher les messages de notification -->
+    <?php if (isset($_GET['message'])): ?>
+        <div class="alert alert-<?= $_GET['status'] === 'success' ? 'success' : 'error' ?>">
+            <?= htmlspecialchars($_GET['message']) ?>
+        </div>
+    <?php endif; ?>
 </main>
 
 <footer>
