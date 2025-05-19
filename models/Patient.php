@@ -17,5 +17,48 @@ class Patient {
             $data["pays"], $data["numero_securite_sociale"], $data["telephone"], $data["adresse_mail"]
         ]);
     }
+
+    /**
+     * Vérifie si un patient peut être supprimé (n'a pas d'ordonnances)
+     * @param int $id Identifiant du patient
+     * @return bool True si le patient peut être supprimé, false sinon
+     */
+    public static function canDelete($id) {
+        $pdo = BDD::getPDO();
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM ordonnance WHERE Numero_patient = ?");
+        $stmt->execute([$id]);
+        $count = $stmt->fetchColumn();
+        return $count == 0;
+    }
+
+    /**
+     * Supprime un patient s'il n'a pas d'ordonnances
+     * @param int $id Identifiant du patient
+     * @return array Résultat de l'opération avec statut et message
+     */
+    public static function delete($id) {
+        if (!self::canDelete($id)) {
+            return [
+                'success' => false,
+                'message' => 'Impossible de supprimer ce patient car il possède des ordonnances.'
+            ];
+        }
+        
+        try {
+            $pdo = BDD::getPDO();
+            $stmt = $pdo->prepare("DELETE FROM patient WHERE Numero_patient = ?");
+            $stmt->execute([$id]);
+            
+            return [
+                'success' => true,
+                'message' => 'Patient supprimé avec succès.'
+            ];
+        } catch (PDOException $e) {
+            return [
+                'success' => false,
+                'message' => 'Erreur lors de la suppression : ' . $e->getMessage()
+            ];
+        }
+    }
 }
 ?>
