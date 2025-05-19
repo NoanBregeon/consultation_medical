@@ -334,66 +334,167 @@ footer {
 /* Styles pour Select2 */
 .select2-container {
     width: 100% !important;
-    margin-bottom: 15px;
+    margin-bottom: 15px !important;
+    height: auto !important;
 }
 
 .select2-container .select2-selection--single {
-    height: 38px;
+    height: 40px !important;
+    padding: 4px 8px !important;
+    border: 1px solid #ddd !important;
+    border-radius: 4px !important;
 }
 
 .select2-container--default .select2-selection--single .select2-selection__rendered {
-    line-height: 38px;
+    line-height: 32px !important;
+    padding-left: 8px !important;
 }
 
 .select2-container--default .select2-selection--single .select2-selection__arrow {
-    height: 36px;
+    height: 38px !important;
+    right: 5px !important;
 }
 
-/* Styles pour les éléments d'ordonnance */
+/* Ajuster la structure du formulaire pour l'alignement */
+form > div {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+
+form > div > label {
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+/* Traiter les éléments de médicament comme des cas spéciaux */
 .medicament-item {
     display: flex;
     gap: 10px;
     margin-bottom: 15px;
     align-items: center;
+    flex-wrap: nowrap;
+    justify-content: space-between;
 }
 
+/* Fixer les largeurs des champs dans les items de médicament */
 .medicament-item .select2-container {
-    flex: 2;
+    flex: 0 0 48%;
+    max-width: 48%;
+    min-width: unset;
+    margin-bottom: 0 !important;
 }
 
 .medicament-item input {
-    flex: 3;
+    flex: 0 0 48%;
+    height: 40px;
+    min-width: unset;
 }
 
-.btn-remove {
-    background: #e74c3c;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    cursor: pointer;
-    display: flex;
+/* Ajuster l'alignement et l'apparence uniforme des champs de formulaire */
+
+/* Uniformiser tous les champs de saisie */
+input, select, textarea, .select2-container .select2-selection--single {
+    height: 40px !important;
+    padding: 0 12px !important;
+    box-sizing: border-box !important;
+    border: 1px solid #ddd !important;
+    border-radius: 4px !important;
+    font-size: 16px !important;
+    background-color: #fff !important;
+}
+
+/* Ajuster spécifiquement les inputs de type date pour l'alignement */
+input[type="date"] {
+    padding-right: 10px !important;
+    min-height: 40px !important;
+}
+
+/* Assurer que le calendrier ne modifie pas la hauteur */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    margin: 0;
+    padding: 0;
+}
+
+/* Style cohérent pour les Select2 */
+.select2-container {
+    width: 100% !important;
+    margin-bottom: 15px !important;
+}
+
+/* Assurer un bon alignement vertical du texte dans Select2 */
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 38px !important;  /* Pour centrer verticalement le texte */
+    padding-left: 12px !important; /* Cohérence avec les autres champs */
+    color: #333 !important;
+}
+
+/* Ajuster la position de la flèche dans Select2 */
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 38px !important;
+    right: 6px !important;
+}
+
+/* Assurer un espacement régulier entre les groupes de champs */
+form > div {
+    margin-bottom: 20px !important;
+}
+
+/* Ajuster les éléments de la grille pour un meilleur alignement */
+form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: start !important;
+}
+
+/* Rendre la section médicaments plus cohérente */
+#medicaments {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 6px;
+    border: 1px solid #eaeaea;
+    grid-column: 1 / -1;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+#medicaments h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #2c3e50;
+    font-size: 18px;
+}
+
+/* Style spécifique pour les items médicament */
+.medicament-item {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 15px;
+    margin-bottom: 12px;
     align-items: center;
-    justify-content: center;
 }
 
-.btn-remove:hover {
-    background: #c0392b;
+/* Rendre les champs médicament plus jolis */
+.medicament-item .select2-container,
+.medicament-item input {
+    margin-bottom: 0 !important;
+    width: 100% !important;
 }
 
-.btn-add {
-    background-color: #2ecc71;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s;
-    margin-right: 10px;
-}
-
-.btn-add:hover {
-    background-color: #27ae60;
+/* Espacement minimal du formulaire */
+@media (max-width: 768px) {
+    form {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .medicament-item {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .btn-remove {
+        justify-self: flex-end;
+    }
 }
