@@ -85,6 +85,7 @@ if ($currentPage > $totalPages && $totalPages > 0) {
                         <th>Code</th>
                         <th>Désignation</th>
                         <th>Laboratoire</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -93,6 +94,13 @@ if ($currentPage > $totalPages && $totalPages > 0) {
                             <td><?= htmlspecialchars($med["Code_medicament"]) ?></td>
                             <td><?= htmlspecialchars($med["Designation"]) ?></td>
                             <td><?= htmlspecialchars($med["Laboratoire"]) ?></td>
+                            <td>
+                                <a href="../controllers/MedicamentController.php?action=delete&code=<?= $med["Code_medicament"] ?>&page=<?= $currentPage ?><?= isset($_GET['q']) ? '&q=' . urlencode($_GET['q']) : '' ?>" 
+                                   class="btn-delete"
+                                   onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce médicament ?');">
+                                    <i class="fas fa-trash"></i> Supprimer
+                                </a>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
