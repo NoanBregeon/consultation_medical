@@ -24,14 +24,15 @@ while (($ligne = fgets($fichier)) !== false) {
     // Vérification minimale que la ligne est correcte
     if (count($colonnes) >= 12 && is_numeric($colonnes[0])) {
         $code = $conn->real_escape_string($colonnes[0]);
-        $designation = implode(" ", array_slice($colonnes, 1, 9));
+        $preparation = $conn->real_escape_string(trim($colonnes[1]));
+        $designation = implode(" ", array_slice($colonnes, 2, 9));
         $designation = $conn->real_escape_string($designation);
         $laboratoire = $conn->real_escape_string(trim($colonnes[10]));
 
 
-        $sql = "INSERT INTO Medicament (Code_medicament, Designation, Laboratoire)
-                VALUES ('$code', '$designation', '$laboratoire')
-                ON DUPLICATE KEY UPDATE Designation='$designation', Laboratoire='$laboratoire'";
+        $sql = "INSERT INTO Medicament (Code_medicament, Preparation, Designation, Laboratoire)
+                VALUES ('$code','$preparation', '$designation', '$laboratoire')
+                ON DUPLICATE KEY UPDATE Preparation='$preparation', Designation='$designation', Laboratoire='$laboratoire'";
 
         $conn->query($sql);
     }
