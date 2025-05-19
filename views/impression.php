@@ -59,10 +59,9 @@ try {
                             <td><?= htmlspecialchars($o["Date"]) ?></td>
                             <td><?= htmlspecialchars($o["nom"] . " " . $o["prenom"]) ?></td>
                             <td>
-                                <a href="imprimer.php?id=<?= $o["Numero_ordonnance"] ?>" class="btn-action">
-                                    <i class="fas fa-print"></i> Imprimer
-                                </a>
+                                <a href="../controllers/pdfController.php?id=<?= $o["Numero_ordonnance"] ?>" target="_blank">🖨️ Imprimer</a>
                             </td>
+
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
