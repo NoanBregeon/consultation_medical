@@ -69,5 +69,48 @@ class Medicament {
         $stmt->execute();
         return $stmt->fetch()['total'];
     }
+    
+    /**
+     * Vérifie si un médicament peut être supprimé (n'est pas utilisé dans des ordonnances)
+     * @param string $code Code du médicament
+     * @return bool True si le médicament peut être supprimé, false sinon
+     */
+    public static function canDelete($code) {
+        $pdo = BDD::getPDO();
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM detail WHERE Code_medicament = ?");
+        $stmt->execute([$code]);
+        $count = $stmt->fetchColumn();
+        return $count == 0;
+    }
+
+    /**
+     * Supprime un médicament s'il n'est pas utilisé dans des ordonnances
+     * @param string $code Code du médicament
+     * @return array Résultat de l'opération avec statut et message
+     */
+    public static function delete($code) {
+        if (!self::canDelete($code)) {
+            return [
+                'success' => false,
+                'message' => 'Impossible de supprimer ce médicament car il est utilisé dans des ordonnances.'
+            ];
+        }
+        
+        try {
+            $pdo = BDD::getPDO();
+            $stmt = $pdo->prepare("DELETE FROM medicament WHERE Code_medicament = ?");
+            $stmt->execute([$code]);
+            
+            return [
+                'success' => true,
+                'message' => 'Médicament supprimé avec succès.'
+            ];
+        } catch (PDOException $e) {
+            return [
+                'success' => false,
+                'message' => 'Erreur lors de la suppression : ' . $e->getMessage()
+            ];
+        }
+    }
 }
 ?>
