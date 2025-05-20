@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3306
--- Généré le : lun. 19 mai 2025 à 08:02
+-- Généré le : mar. 20 mai 2025 à 08:09
 -- Version du serveur : 8.3.0
 -- Version de PHP : 8.2.18
 
@@ -20,7 +20,7 @@ SET time_zone = "+00:00";
 --
 -- Base de données : `consultation_medical`
 --
-CREATE DATABASE IF NOT EXISTS `consultation_medical` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+CREATE DATABASE IF NOT EXISTS `consultation_medical` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 USE `consultation_medical`;
 
 -- --------------------------------------------------------
@@ -48,11 +48,12 @@ CREATE TABLE IF NOT EXISTS `detail` (
 
 DROP TABLE IF EXISTS `medicament`;
 CREATE TABLE IF NOT EXISTS `medicament` (
-  `Code_medicament` varchar(20) NOT NULL,
-  `Designation` varchar(100) DEFAULT NULL,
-  `Laboratoire` varchar(100) DEFAULT NULL,
+  `Code_medicament` bigint NOT NULL,
+  `Preparation` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `Designation` text COLLATE utf8mb4_general_ci,
+  `Laboratoire` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   PRIMARY KEY (`Code_medicament`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
