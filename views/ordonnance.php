@@ -2,7 +2,10 @@
 require_once '../models/BDD.php';
 $pdo = BDD::getPdo();
 $patients = $pdo->query("SELECT * FROM patient ORDER BY nom, prenom")->fetchAll();
-$medicaments = $pdo->query("SELECT * FROM medicament ORDER BY Designation")->fetchAll();
+$medicaments = $pdo->query("SELECT * FROM medicament ORDER BY Preparation")->fetchAll();
+
+// Récupérer l'ID du patient si disponible
+$patient_id = isset($_GET['patient_id']) ? $_GET['patient_id'] : null;
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -36,7 +39,9 @@ $medicaments = $pdo->query("SELECT * FROM medicament ORDER BY Designation")->fet
             <select name="patient" id="patient" class="select2-patient" required>
                 <option value="">-- Sélectionner un patient --</option>
                 <?php foreach ($patients as $p): ?>
-                    <option value="<?= $p["Numero_patient"] ?>"><?= $p["nom"] . " " . $p["prenom"] ?> - <?= $p["ville"] ?></option>
+                    <option value="<?= $p["Numero_patient"] ?>" <?= ($patient_id && $p["Numero_patient"] == $patient_id) ? 'selected' : '' ?>>
+                        <?= $p["nom"] . " " . $p["prenom"] ?> - <?= $p["ville"] ?>
+                    </option>
                 <?php endforeach; ?>
             </select>
         </div>
@@ -49,10 +54,11 @@ $medicaments = $pdo->query("SELECT * FROM medicament ORDER BY Designation")->fet
         <div id="medicaments">
             <h3>Médicaments et posologies</h3>
             <div class="medicament-item">
+                <!-- Partie où les médicaments sont affichés dans le select initial -->
                 <select name="medicament[]" class="select2-medicament">
                     <option value="">-- Sélectionner un médicament --</option>
                     <?php foreach ($medicaments as $m): ?>
-                        <option value="<?= $m["Code_medicament"] ?>"><?= $m["Designation"] ?> (<?= $m["Laboratoire"] ?>)</option>
+                        <option value="<?= $m["Code_medicament"] ?>"><?= $m['Preparation'] ?> - <?= $m["Designation"] ?> (<?= $m["Laboratoire"] ?>)</option>
                     <?php endforeach; ?>
                 </select>
                 <input name="posologie[]" placeholder="Posologie (ex: 1 comprimé matin et soir)" required>
@@ -64,9 +70,15 @@ $medicaments = $pdo->query("SELECT * FROM medicament ORDER BY Designation")->fet
             <i class="fas fa-plus"></i> Ajouter un médicament
         </button>
         <button type="submit">
-            <i class="fas fa-save"></i> Créer l'ordonnance
+            <i class="fas fa-print"></i> Imprimer l'ordonnance
         </button>
     </form>
+
+    <?php if (isset($_GET['error'])): ?>
+        <div class="error-message">
+            <i class="fas fa-exclamation-triangle"></i> <?= htmlspecialchars($_GET['error']) ?>
+        </div>
+    <?php endif; ?>
 </main>
 
 <footer>
@@ -79,11 +91,47 @@ $(document).ready(function() {
     $('.select2-patient').select2({
         language: "fr",
         placeholder: "Rechercher un patient...",
-        allowClear: true
+        allowClear: true,
+        width: 'resolve',
+        minimumInputLength: 3,
+        ajax: {
+            url: '../controllers/patientController.php?action=search',
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return {
+                    q: params.term
+                };
+            },
+            processResults: function (data) {
+                return { results: data };
+            },
+            cache: true
+        }
     });
     
     // Initialisation de Select2 pour les médicaments
-    initializeSelect2();
+    $('.select2-medicament').select2({
+        language: "fr",
+        placeholder: "Rechercher un médicament...",
+        allowClear: true,
+        width: 'resolve',
+        minimumInputLength: 3,
+        ajax: {
+            url: '../controllers/MedicamentController.php?action=search',
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return {
+                    q: params.term
+                };
+            },
+            processResults: function (data) {
+                return { results: data };
+            },
+            cache: true
+        }
+    });
     
     // Permettre la suppression des médicaments (sauf le premier)
     $('#medicaments').on('click', '.btn-remove', function() {
@@ -96,55 +144,67 @@ function initializeSelect2() {
     $('.select2-medicament').select2({
         language: "fr",
         placeholder: "Rechercher un médicament...",
-        allowClear: true
+        allowClear: true,
+        width: 'resolve',
+        dropdownAutoWidth: true,
+        minimumInputLength: 3,
+        ajax: {
+            url: '../controllers/MedicamentController.php?action=search',
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return {
+                    q: params.term
+                };
+            },
+            processResults: function (data) {
+                return { results: data };
+            },
+            cache: true
+        }
     });
 }
 
 function ajouterMedicament() {
     const container = document.getElementById('medicaments');
-    const items = container.querySelectorAll('.medicament-item');
     const newItem = document.createElement('div');
     newItem.className = 'medicament-item';
-    
-    // Cloner le contenu du premier élément
-    const firstItem = items[0];
-    newItem.innerHTML = firstItem.innerHTML;
-    
-    // Vider les valeurs et réinitialiser les select
-    const selects = newItem.querySelectorAll('select');
-    selects.forEach(select => {
-        // Détruire l'instance Select2 existante s'il y en a une
-        if ($(select).hasClass('select2-hidden-accessible')) {
-            $(select).select2('destroy');
-        }
-        select.value = '';
-    });
-    
-    const inputs = newItem.querySelectorAll('input');
-    inputs.forEach(input => input.value = '');
-    
-    // Afficher le bouton de suppression
-    const removeButton = newItem.querySelector('.btn-remove');
-    if (removeButton) {
-        removeButton.style.display = 'flex';
-    }
-    
-    // Ajouter le nouvel élément
+
+    // Créer un nouvel élément HTML pour le médicament
+    newItem.innerHTML = `
+        <select name="medicament[]" class="select2-medicament" required>
+            <option value=""></option>
+        </select>
+        <input name="posologie[]" placeholder="Posologie (ex: 1 comprimé matin et soir)" required>
+        <button type="button" class="btn-remove"><i class="fas fa-times"></i></button>
+    `;
+
+    // Ajouter le nouvel élément au conteneur
     container.appendChild(newItem);
-    
-    // Réinitialiser Select2 pour les nouveaux éléments
-    initializeSelect2();
-    
-    // Afficher les boutons de suppression pour tous les éléments sauf le premier
-    // si nous avons plus d'un élément
-    if (items.length >= 1) {
-        items.forEach((item, index) => {
-            const btn = item.querySelector('.btn-remove');
-            if (btn) {
-                btn.style.display = index === 0 && items.length === 1 ? 'none' : 'flex';
-            }
-        });
-    }
+
+    // Réinitialiser Select2 pour le nouvel élément
+    $(newItem).find('.select2-medicament').select2({
+        language: "fr",
+        placeholder: "Rechercher un médicament...",
+        allowClear: true,
+        width: 'resolve',
+        dropdownAutoWidth: true,
+        minimumInputLength: 3,
+        ajax: {
+            url: '../controllers/MedicamentController.php?action=search',
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return {
+                    q: params.term
+                };
+            },
+            processResults: function (data) {
+                return { results: data };
+            },
+            cache: true
+        }
+    });
 }
 </script>
 </body>
