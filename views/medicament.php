@@ -83,6 +83,7 @@ if ($currentPage > $totalPages && $totalPages > 0) {
                 <thead>
                     <tr>
                         <th>Code</th>
+                        <th>Préparation</th>
                         <th>Désignation</th>
                         <th>Laboratoire</th>
                         <th>Actions</th>
@@ -92,6 +93,7 @@ if ($currentPage > $totalPages && $totalPages > 0) {
                     <?php foreach ($medicaments as $med): ?>
                         <tr>
                             <td><?= htmlspecialchars($med["Code_medicament"]) ?></td>
+                            <td><?= htmlspecialchars($med["Preparation"]) ?></td>
                             <td><?= htmlspecialchars($med["Designation"]) ?></td>
                             <td><?= htmlspecialchars($med["Laboratoire"]) ?></td>
                             <td>
