@@ -2,16 +2,25 @@
 require_once 'BDD.php';
 
 class Ordonnance {
-    public static function create($patientId, $medicaments) {
+    public static function create($data) {
         $pdo = BDD::getPDO();
-        $pdo->prepare("INSERT INTO ordonnance (Date, Numero_patient) VALUES (?, ?)")
-            ->execute([date("Y-m-d"), $patientId]);
-        $id = $pdo->lastInsertId();
+        $stmt = $pdo->prepare("INSERT INTO ordonnance (Numero_patient, Date) VALUES (:patient, :date)");
+        $stmt->execute([
+            'patient' => $data['Numero_patient'],
+            'date' => $data['Date']
+        ]);
+        return $pdo->lastInsertId();
+    }
 
-        foreach ($medicaments as $m) {
-            $pdo->prepare("INSERT INTO detail (Numero_ordonnance, Code_medicament, Posologie)
-                           VALUES (?, ?, ?)")->execute([$id, $m["code"], $m["posologie"]]);
-        }
+    public static function ajouterMedicament($ordonnance_id, $medicament_id, $posologie) {
+        $pdo = BDD::getPDO();
+        $stmt = $pdo->prepare("INSERT INTO detail (Numero_ordonnance, Code_medicament, Posologie) VALUES (:ordonnance, :medicament, :posologie)");
+        $stmt->execute([
+            'ordonnance' => $ordonnance_id,
+            'medicament' => $medicament_id,
+            'posologie' => $posologie
+        ]);
+        return true;
     }
 
     public static function getAll() {
