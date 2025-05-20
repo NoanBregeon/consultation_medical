@@ -334,6 +334,7 @@ footer {
 /* Styles pour Select2 */
 .select2-container {
     width: 100% !important;
+    max-width: 400px !important; /* Limiter la largeur maximale */
     margin-bottom: 15px !important;
     height: auto !important;
 }
@@ -353,6 +354,12 @@ footer {
 .select2-container--default .select2-selection--single .select2-selection__arrow {
     height: 38px !important;
     right: 5px !important;
+}
+
+.select2-dropdown {
+    width: auto !important; /* Ajuster automatiquement la largeur */
+    max-width: 400px !important; /* Limiter la largeur maximale */
+    box-sizing: border-box;
 }
 
 /* Ajuster la structure du formulaire pour l'alignement */
@@ -419,6 +426,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 /* Style cohérent pour les Select2 */
 .select2-container {
     width: 100% !important;
+    max-width: 400px !important; /* Limiter la largeur maximale */
     margin-bottom: 15px !important;
 }
 
