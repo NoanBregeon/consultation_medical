@@ -46,33 +46,57 @@ class MedicamentController {
     }
     
     /**
-     * Gère la suppression d'un médicament
+     * Recherche des médicaments pour Select2
      */
-    public static function deleteMedicament($code) {
-        return Medicament::delete($code);
+    public static function searchMedicaments($searchTerm) {
+        try {
+            // Vérifier que le terme de recherche a au moins 3 caractères
+            if (strlen($searchTerm) < 3) {
+                return json_encode([]); // Retourner un tableau vide si le terme est trop court
+            }
+
+            // Appeler la méthode de recherche dans le modèle Medicament
+            $medicaments = Medicament::search($searchTerm, 50, 0); // Limite à 50 résultats
+
+            // Formater les résultats pour Select2
+            $results = array_map(function ($med) {
+                return [
+                    'id' => $med['Code_medicament'],
+                    'text' => $med['Preparation'] . ' - ' . $med['Designation'] . ' (' . $med['Laboratoire'] . ')'
+                ];
+            }, $medicaments);
+
+            // Retourner les résultats au format JSON
+            return json_encode($results);
+        } catch (Exception $e) {
+            // En cas d'erreur, retourner un tableau vide
+            error_log('Erreur de recherche de médicament : ' . $e->getMessage());
+            return json_encode([]);
+        }
     }
 }
 
-// Traiter la requête de suppression si elle existe
-if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['code'])) {
-    $response = MedicamentController::deleteMedicament($_GET['code']);
-    
-    // Rediriger avec un message de notification
-    $redirectUrl = "../views/medicament.php?message=" . urlencode($response['message']);
-    if ($response['success']) {
-        $redirectUrl .= "&status=success";
-    } else {
-        $redirectUrl .= "&status=error";
+// Traiter la requête de recherche si elle existe
+if (isset($_GET['action']) && $_GET['action'] === 'search' && isset($_GET['q'])) {
+    header('Content-Type: application/json');
+    try {
+        $searchTerm = trim($_GET['q']);
+        if (strlen($searchTerm) < 3) {
+            echo json_encode([]);
+            exit;
+        }
+        
+        $medicaments = Medicament::search($searchTerm, 50, 0);
+        $results = array_map(function($m) {
+            return [
+                'id' => $m['Code_medicament'],
+                'text' => $m['Preparation'] . ' - ' . $m['Designation'] . ' (' . $m['Laboratoire'] . ')'
+            ];
+        }, $medicaments);
+        
+        echo json_encode($results);
+    } catch (Exception $e) {
+        echo json_encode(['error' => $e->getMessage()]);
     }
-    
-    // Conserver les paramètres de pagination et de recherche
-    if (isset($_GET['page'])) {
-        $redirectUrl .= "&page=" . intval($_GET['page']);
-    }
-    if (isset($_GET['q'])) {
-        $redirectUrl .= "&q=" . urlencode($_GET['q']);
-    }
-    
-    header("Location: $redirectUrl");
     exit;
 }
