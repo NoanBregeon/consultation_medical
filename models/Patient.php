@@ -60,5 +60,27 @@ class Patient {
             ];
         }
     }
+
+    public static function search($term, $limit = 50, $offset = 0) {
+        try {
+            $pdo = BDD::getPdo();
+            $stmt = $pdo->prepare("
+                SELECT Numero_patient, nom, prenom, ville 
+                FROM patient 
+                WHERE nom LIKE :search OR prenom LIKE :search OR ville LIKE :search 
+                ORDER BY nom, prenom 
+                LIMIT :limit OFFSET :offset
+            ");
+            $searchTerm = '%' . $term . '%';
+            $stmt->bindValue(':search', $searchTerm, PDO::PARAM_STR);
+            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Erreur dans Patient::search: ' . $e->getMessage());
+            return [];
+        }
+    }
 }
 ?>
