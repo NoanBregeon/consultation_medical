@@ -1,68 +1,82 @@
 <?php
 require_once '../models/BDD.php';
-$pdo = BDD::getPdo();
-$patients = $pdo->query("SELECT * FROM patient ORDER BY nom, prenom")->fetchAll();
 ?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Patients - Gestion Médicale</title>
+    <title>Ajouter un patient - Gestion Médicale</title>
     <link rel="stylesheet" href="../css/style.css?v=2">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 <header class="main-header">
     <div class="header-content">
-        <h1><i class="fas fa-user-alt"></i> Gestion des patients</h1>
+        <h1><i class="fas fa-user-plus"></i> Ajouter un patient</h1>
     </div>
     <?php include '../layouts/header.php';?>
 </header>
 <main>
-    <h2>Ajouter un patient</h2>
     <form method="post" action="../controllers/patientController.php">
-        <input name="nom" placeholder="Nom" required>
-        <input name="prenom" placeholder="Prénom" required>
-        <input name="adresse" placeholder="Adresse">
-        <input name="code_postal" placeholder="Code Postal">
-        <input name="ville" placeholder="Ville">
-        <input name="pays" placeholder="Pays" value="France">
-        <input name="numero_securite_sociale" placeholder="N° Sécurité Sociale">
-        <input name="telephone" placeholder="Téléphone">
-        <input name="adresse_mail" placeholder="Adresse mail">
-        <button type="submit">Ajouter le patient</button>
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="nom">Nom</label>
+                <input id="nom" name="nom" placeholder="Nom" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="prenom">Prénom</label>
+                <input id="prenom" name="prenom" placeholder="Prénom" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="adresse">Adresse</label>
+                <input id="adresse" name="adresse" placeholder="Adresse">
+            </div>
+            
+            <div class="form-group">
+                <label for="code_postal">Code postal</label>
+                <input id="code_postal" name="code_postal" placeholder="Code Postal">
+            </div>
+            
+            <div class="form-group">
+                <label for="ville">Ville</label>
+                <input id="ville" name="ville" placeholder="Ville">
+            </div>
+            
+            <div class="form-group">
+                <label for="pays">Pays</label>
+                <input id="pays" name="pays" placeholder="Pays" value="France">
+            </div>
+            
+            <div class="form-group">
+                <label for="numero_securite_sociale">N° Sécurité sociale</label>
+                <input id="numero_securite_sociale" name="numero_securite_sociale" placeholder="N° Sécurité Sociale">
+            </div>
+            
+            <div class="form-group">
+                <label for="telephone">Téléphone</label>
+                <input id="telephone" name="telephone" placeholder="Téléphone">
+            </div>
+            
+            <div class="form-group">
+                <label for="adresse_mail">Email</label>
+                <input id="adresse_mail" name="adresse_mail" placeholder="Adresse mail" type="email">
+            </div>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn">
+                <i class="fas fa-save"></i> Ajouter le patient
+            </button>
+            <a href="impression.php" class="btn secondary">
+                <i class="fas fa-list"></i> Voir la liste des patients
+            </a>
+        </div>
     </form>
 
-    <h2>Liste des patients (<?= count($patients) ?>)</h2>
-    <table>
-        <tr>
-            <th>Nom</th>
-            <th>Prénom</th>
-            <th>Ville</th>
-            <th>Téléphone</th>
-            <th>Email</th>
-            <th>Actions</th>
-        </tr>
-        <?php foreach ($patients as $patient): ?>
-            <tr>
-                <td><?= htmlspecialchars($patient["nom"]) ?></td>
-                <td><?= htmlspecialchars($patient["prenom"]) ?></td>
-                <td><?= htmlspecialchars($patient["ville"]) ?></td>
-                <td><?= htmlspecialchars($patient["telephone"]) ?></td>
-                <td><?= htmlspecialchars($patient["adresse_mail"]) ?></td>
-                <td>
-                    <a href="../controllers/patientController.php?action=delete&id=<?= $patient["Numero_patient"] ?>" 
-                       class="btn-delete"
-                       onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce patient ?');">
-                        <i class="fas fa-trash"></i> Supprimer
-                    </a>
-                </td>
-            </tr>
-        <?php endforeach; ?>
-    </table>
-
-    <!-- Ajouter ce code pour afficher les messages de notification -->
+    <!-- Affichage des messages -->
     <?php if (isset($_GET['message'])): ?>
         <div class="alert alert-<?= $_GET['status'] === 'success' ? 'success' : 'error' ?>">
             <?= htmlspecialchars($_GET['message']) ?>
